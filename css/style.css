@@ -1,0 +1,312 @@
+:root {
+  --ink: #f5f1e4;
+  --ink-dim: rgba(245, 241, 228, 0.68);
+  --gold: #f5d547;
+  --sky: #cfe6ff;
+  --night: #0b1430;
+  --glass-top: rgba(255, 255, 255, 0.13);
+  --glass-bot: rgba(255, 255, 255, 0.04);
+  --glass-line: rgba(255, 255, 255, 0.18);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; min-height: 100%; }
+
+body {
+  background: var(--night) url("../assets/starry-night.jpg") center / cover fixed;
+  color: var(--ink);
+  font: 15px/1.4 "Manrope", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ── слои ─────────────────────────────────────────── */
+#bg {
+  position: fixed; inset: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+#bg.ready { opacity: 1; }
+#sparks {
+  position: fixed; inset: 0;
+  width: 100%; height: 100%;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(28px, 7vh, 80px) 24px 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  perspective: 1400px;
+}
+
+/* ── часы ─────────────────────────────────────────── */
+.clock { text-align: center; text-shadow: 0 4px 30px rgba(5, 10, 30, 0.7); }
+.time {
+  font: 600 clamp(64px, 10vw, 128px)/0.95 "Cormorant Garamond", Georgia, serif;
+  letter-spacing: 0.01em;
+}
+.sub {
+  margin-top: 8px;
+  font: italic 500 clamp(18px, 2vw, 24px) "Cormorant Garamond", Georgia, serif;
+  color: var(--ink-dim);
+}
+.sub::first-letter { text-transform: uppercase; }
+
+/* ── стекло ───────────────────────────────────────── */
+.glass {
+  background:
+    linear-gradient(140deg, var(--glass-top), var(--glass-bot)),
+    rgba(8, 14, 38, 0.38);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(18px) saturate(150%);
+  border: 1px solid var(--glass-line);
+  border-radius: 24px;
+  box-shadow:
+    0 24px 60px -24px rgba(2, 6, 20, 0.75),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+.panel {
+  will-change: transform;
+  transform-style: preserve-3d;
+  opacity: 0;
+  translate: 0 14px;
+  transition: opacity 0.9s var(--ease), translate 0.9s var(--ease);
+  transition-delay: calc(var(--i, 0) * 70ms + 150ms);
+}
+.loaded .panel { opacity: 1; translate: 0 0; }
+
+/* ── главная панель ───────────────────────────────── */
+.dock {
+  align-self: center;
+  width: min(100%, 860px);
+  padding: 22px 26px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+}
+.engine {
+  flex: none;
+  width: 54px; height: 54px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-line);
+  cursor: pointer;
+  transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease), background 0.35s;
+}
+.engine svg { width: 28px; height: 28px; }
+.engine:hover { transform: translateY(-2px) scale(1.06); background: rgba(255, 255, 255, 0.16); }
+.engine.active {
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 0 2px rgba(245, 213, 71, 0.75), 0 0 26px rgba(245, 213, 71, 0.45);
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 54px;
+  width: 0;
+  opacity: 0;
+  overflow: hidden;
+  margin-left: -12px;
+  padding: 0;
+  border-radius: 27px;
+  background: rgba(8, 14, 36, 0.55);
+  border: 1px solid transparent;
+  transition:
+    width 0.6s var(--ease), opacity 0.35s ease, margin 0.6s var(--ease),
+    padding 0.6s var(--ease), border-color 0.4s, box-shadow 0.4s;
+}
+.search.open .search-box {
+  width: min(560px, 100%);
+  opacity: 1;
+  margin-left: 0;
+  padding: 0 6px 0 18px;
+  border-color: var(--glass-line);
+}
+.search.open .search-box:focus-within { box-shadow: 0 0 0 3px rgba(207, 230, 255, 0.18); }
+.search.drop .search-box { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(245, 213, 71, 0.3); }
+
+.search-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--ink);
+  font: 500 17px "Manrope", sans-serif;
+}
+.search-input::placeholder { color: rgba(245, 241, 228, 0.45); }
+
+.search-attach, .search-go {
+  flex: none;
+  width: 40px; height: 40px;
+  border: 0;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  background: none;
+  color: var(--ink-dim);
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s, transform 0.25s var(--ease);
+}
+.search-attach svg, .search-go svg { width: 20px; height: 20px; }
+.search-attach:hover, .search-go:hover { background: rgba(255, 255, 255, 0.1); color: var(--ink); }
+.search-go { background: rgba(245, 213, 71, 0.9); color: #1a1a10; }
+.search-go:hover { background: var(--gold); color: #1a1a10; transform: scale(1.06); }
+.has-file .search-attach { color: var(--gold); }
+
+.search-chip {
+  flex: none;
+  position: relative;
+  display: flex;
+  margin-right: 8px;
+  animation: pop 0.35s var(--ease);
+}
+.search-chip img {
+  width: 36px; height: 36px;
+  object-fit: cover;
+  border-radius: 9px;
+  border: 1px solid var(--glass-line);
+}
+.search-chip button {
+  position: absolute;
+  top: -5px; right: -6px;
+  width: 18px; height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #f5f1e4;
+  color: #10162e;
+  font: 600 13px/18px "Manrope", sans-serif;
+  cursor: pointer;
+}
+.search-chip[hidden] { display: none; }
+@keyframes pop { from { transform: scale(0.6); opacity: 0; } }
+
+/* ── избранное ────────────────────────────────────── */
+.favorites {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 10px;
+}
+.fav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  width: 84px;
+  padding: 8px 4px 6px;
+  border-radius: 16px;
+  color: var(--ink);
+  text-decoration: none;
+  transition: background 0.3s, transform 0.35s var(--ease);
+}
+.fav:hover { background: rgba(255, 255, 255, 0.08); transform: translateY(-3px); }
+.fav-icon {
+  width: 50px; height: 50px;
+  display: grid; place-items: center;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 18px -8px rgba(0, 0, 0, 0.6);
+}
+.fav-icon img { border-radius: 6px; }
+.fav-label {
+  font-size: 12.5px;
+  color: var(--ink-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.fav:hover .fav-label { color: var(--ink); }
+
+/* ── панели по категориям ─────────────────────────── */
+.groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+.group { padding: 18px 14px 12px; }
+.group h2 {
+  margin: 0 8px 10px;
+  font: italic 600 23px/1.1 "Cormorant Garamond", Georgia, serif;
+  white-space: nowrap;
+  color: var(--gold);
+  text-shadow: 0 2px 14px rgba(245, 213, 71, 0.25);
+}
+.group ul { list-style: none; margin: 0; padding: 0; }
+.group a {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 7px 8px;
+  border-radius: 11px;
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.25s, transform 0.3s var(--ease);
+}
+.group a img { flex: none; border-radius: 4px; }
+.group a span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.group a:hover { background: rgba(255, 255, 255, 0.1); transform: translateX(3px); }
+
+a:focus-visible, button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* ── тост ─────────────────────────────────────────── */
+.toast {
+  position: fixed;
+  left: 50%; bottom: 28px;
+  z-index: 60;
+  translate: -50% 20px;
+  opacity: 0;
+  padding: 12px 18px;
+  border-radius: 14px;
+  background: rgba(10, 16, 40, 0.85);
+  border: 1px solid var(--glass-line);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  pointer-events: none;
+  transition: opacity 0.35s, translate 0.45s var(--ease);
+}
+.toast.show { opacity: 1; translate: -50% 0; }
+
+/* ── мобильные ────────────────────────────────────── */
+@media (max-width: 640px) {
+  .wrap { padding: 28px 16px 40px; gap: 18px; }
+  .dock { padding: 16px 12px 12px; }
+  .engine { width: 46px; height: 46px; }
+  .search-box { height: 46px; }
+  .fav { width: 72px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel { transition: none; }
+}
