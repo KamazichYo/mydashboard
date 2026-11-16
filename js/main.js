@@ -49,6 +49,8 @@ try {
   for (const it of all) {
     const a = document.createElement("a");
     a.href = it.url;
+    a.target = "_blank";
+    a.rel = "noopener";
     a.textContent = it.name;
     nav.append(a);
   }

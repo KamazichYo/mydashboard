@@ -92,10 +92,13 @@ export function startSearch(root, toast) {
     if (!engine) return;
     const q = input.value.trim();
     if (file) {
-      if (engine === "google") return googleLens(file);
-      return yandexImage(file, toast);
+      if (engine === "google") googleLens(file);
+      else yandexImage(file, toast);
+      setFile(null);
+      input.value = "";
+      return;
     }
-    if (q) location.href = ENGINES[engine].text(q);
+    if (q) { window.open(ENGINES[engine].text(q), "_blank", "noopener"); input.value = ""; }
   });
 }
 
@@ -105,6 +108,7 @@ function googleLens(file) {
   form.method = "POST";
   form.enctype = "multipart/form-data";
   form.action = "https://lens.google.com/v3/upload";
+  form.target = "_blank";
   const inp = document.createElement("input");
   inp.type = "file";
   inp.name = "encoded_image";
@@ -115,11 +119,14 @@ function googleLens(file) {
   form.style.display = "none";
   document.body.append(form);
   form.submit();
+  form.remove();
 }
 
 // Яндекс не даёт загрузить картинку со стороннего сайта (CORS),
 // поэтому кладём её в буфер и открываем Яндекс Картинки — там ⌘V.
 async function yandexImage(file, toast) {
+  const tab = window.open("about:blank", "_blank");
+  const go = () => { if (tab) tab.location.href = "https://yandex.ru/images/"; };
   try {
     const bmp = await createImageBitmap(file);
     const c = document.createElement("canvas");
@@ -128,9 +135,9 @@ async function yandexImage(file, toast) {
     const png = await new Promise((r) => c.toBlob(r, "image/png"));
     await navigator.clipboard.write([new ClipboardItem({ "image/png": png })]);
     toast("Картинка в буфере — на Яндексе нажми ⌘V");
-    setTimeout(() => (location.href = "https://yandex.ru/images/"), 900);
+    go();
   } catch {
     toast("Не вышло скопировать — открываю Яндекс Картинки");
-    setTimeout(() => (location.href = "https://yandex.ru/images/"), 900);
+    go();
   }
 }

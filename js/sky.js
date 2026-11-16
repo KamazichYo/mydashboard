@@ -162,14 +162,13 @@ export function startSky({ canvas, labels, center, engines }) {
       return;
     }
     if (b.url) {
-      if (e.metaKey || e.ctrlKey) window.open(b.url, "_blank");
-      else location.href = b.url;
+      window.open(b.url, "_blank", "noopener");   // домашняя остаётся на месте
     }
   });
   addEventListener("auxclick", (e) => {
     if (e.button !== 1) return;
     const b = hit();
-    if (b?.url) window.open(b.url, "_blank");
+    if (b?.url) window.open(b.url, "_blank", "noopener");
   });
   addEventListener("keydown", (e) => { if (e.key === "Escape" && open) collapse(open); });
 
