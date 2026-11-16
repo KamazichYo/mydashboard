@@ -17,6 +17,7 @@ export const FAVORITES = [
   { name: "Claude",     url: "https://claude.ai/",           size: 1.0 },
   { name: "List.am",    url: "https://www.list.am/",         size: 0.9 },
   { name: "ChatGPT",    url: "https://chatgpt.com/",         size: 0.9 },
+  { name: "Perplexity", url: "https://www.perplexity.ai/",   size: 0.95 },
 ];
 
 // Облака-группы: при наведении распаковываются в облачка-сайты.
