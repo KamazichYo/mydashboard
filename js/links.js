@@ -1,42 +1,40 @@
 // ─────────────────────────────────────────────────────────────
 //  Все ссылки стартовой страницы — правь только этот файл.
-//  name — подпись, url — адрес, icon — (необязательно) своя иконка.
+//  name — подпись, url — адрес.
+//  size — (необязательно) размер облака, 1 = обычный.
+//  icon — (необязательно) своя картинка-логотип (лучше квадратная PNG).
+//  Иконки сайтов скачиваются сами при публикации (tools/fetch-icons.mjs).
 // ─────────────────────────────────────────────────────────────
 
-// Верхний ряд в главной панели — самое частое.
+// Отдельные большие облака — то, чем пользуешься чаще всего.
 export const FAVORITES = [
-  { name: "YouTube",    url: "https://www.youtube.com/" },
-  { name: "VK",         url: "https://vk.com/" },
-  { name: "Claude",     url: "https://claude.ai/" },
-  { name: "ChatGPT",    url: "https://chatgpt.com/" },
-  { name: "GitHub",     url: "https://github.com/KamazichYo" },
-  { name: "ElevenLabs", url: "https://elevenlabs.io/app" },
-  { name: "Flow",       url: "https://flow.google.com/" },
-  { name: "List.am",    url: "https://www.list.am/" },
+  { name: "YouTube",    url: "https://www.youtube.com/",     size: 1.25 },
+  { name: "VK",         url: "https://vk.com/",              size: 1.15 },
+  { name: "Playerok",   url: "https://playerok.com/",        size: 1.1 },
+  { name: "GitHub",     url: "https://github.com/KamazichYo", size: 1.05 },
+  { name: "ElevenLabs", url: "https://elevenlabs.io/app",    size: 1.0 },
+  { name: "Flow",       url: "https://flow.google.com/",     size: 1.0 },
+  { name: "Claude",     url: "https://claude.ai/",           size: 1.0 },
+  { name: "List.am",    url: "https://www.list.am/",         size: 0.9 },
+  { name: "ChatGPT",    url: "https://chatgpt.com/",         size: 0.9 },
 ];
 
-// Панели по категориям.
+// Облака-группы: при наведении распаковываются в облачка-сайты.
 export const GROUPS = [
   {
     title: "Нейросети",
     items: [
-      { name: "Claude",       url: "https://claude.ai/" },
-      { name: "ChatGPT",      url: "https://chatgpt.com/" },
       { name: "Gemini",       url: "https://gemini.google.com/" },
-      { name: "Google Flow",  url: "https://flow.google.com/" },
       { name: "Google Labs",  url: "https://labs.google/" },
       { name: "Higgsfield",   url: "https://higgsfield.ai/" },
       { name: "PixVerse",     url: "https://app.pixverse.ai/" },
-      { name: "ElevenLabs",   url: "https://elevenlabs.io/app" },
       { name: "Hugging Face", url: "https://huggingface.co/" },
       { name: "GramGPT",      url: "https://gramgpt.io/panel" },
     ],
   },
   {
-    title: "Видео и соцсети",
+    title: "Видео",
     items: [
-      { name: "YouTube",      url: "https://www.youtube.com/" },
-      { name: "VK",           url: "https://vk.com/" },
       { name: "VK Видео",     url: "https://vkvideo.ru/" },
       { name: "Rutube",       url: "https://rutube.ru/" },
       { name: "vidIQ",        url: "https://app.vidiq.com/" },
@@ -47,7 +45,6 @@ export const GROUPS = [
   {
     title: "Разработка",
     items: [
-      { name: "GitHub",         url: "https://github.com/KamazichYo" },
       { name: "React Bits",     url: "https://reactbits.dev/" },
       { name: "React Bits Pro", url: "https://pro.reactbits.dev/" },
       { name: "Magic UI",       url: "https://magicui.design/" },
@@ -60,13 +57,11 @@ export const GROUPS = [
   {
     title: "Покупки",
     items: [
-      { name: "List.am",  url: "https://www.list.am/" },
-      { name: "Playerok", url: "https://playerok.com/" },
-      { name: "FunPay",   url: "https://funpay.com/" },
-      { name: "GGSEL",    url: "https://ggsel.net/" },
-      { name: "Kwork",    url: "https://kwork.ru/" },
-      { name: "Temu",     url: "https://www.temu.com/" },
-      { name: "eBay",     url: "https://www.ebay.com/" },
+      { name: "FunPay", url: "https://funpay.com/" },
+      { name: "GGSEL",  url: "https://ggsel.net/" },
+      { name: "Kwork",  url: "https://kwork.ru/" },
+      { name: "Temu",   url: "https://www.temu.com/" },
+      { name: "eBay",   url: "https://www.ebay.com/" },
     ],
   },
   {
@@ -81,3 +76,9 @@ export const GROUPS = [
     ],
   },
 ];
+
+// Облачка поисковиков под часами.
+export const SEARCH_ICONS = {
+  google: "https://www.google.com/",
+  yandex: "https://yandex.ru/",
+};
