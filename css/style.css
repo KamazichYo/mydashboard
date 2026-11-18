@@ -49,6 +49,24 @@ body {
 }
 .cloud-label.child { font-size: 12px; }
 
+/* ── смена картины: кнопки-облачка внизу (рисует sky.js, тут только зона клика) ── */
+.paint-nav {
+  position: fixed; left: 50%; bottom: 22px; z-index: 5;
+  transform: translateX(-50%);
+  display: flex; align-items: center; gap: 10px;
+}
+.nav-btn { width: 70px; height: 52px; border: 0; border-radius: 40%; background: none; cursor: pointer; padding: 0; }
+.nav-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+.paint-title {
+  min-width: 190px; text-align: center;
+  font: italic 600 16px/1.2 "Cormorant Garamond", Georgia, serif;
+  color: var(--gold);
+  text-shadow: 0 1px 3px rgba(8, 14, 40, 0.95), 0 0 16px rgba(8, 14, 40, 0.85);
+  opacity: 0; transition: opacity 0.8s ease;
+}
+.paint-title.show { opacity: 0.9; }
+
+
 /* ── центр: часы + поиск ──────────────────────────── */
 .center {
   position: fixed;

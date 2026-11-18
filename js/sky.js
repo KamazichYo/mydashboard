@@ -8,7 +8,7 @@ const iconSrc = (item) => item.icon || `assets/icons/${host(item.url)}.png`;
 const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 const ease = (x) => 1 - Math.pow(1 - Math.min(1, Math.max(0, x)), 3);
 
-export function startSky({ canvas, labels, center, engines }) {
+export function startSky({ canvas, labels, center, engines, navs = [] }) {
   const R = new CloudRenderer(canvas);
   const bodies = [];
   let seed = 7;
@@ -18,7 +18,7 @@ export function startSky({ canvas, labels, center, engines }) {
       x: innerWidth / 2, y: innerHeight / 2, vx: 0, vy: 0, r: 60, base: 60,
       calm: 0, appear: 0, appearTo: 1, t: Math.random() * 100, anim: Math.random() * 100,
       ph: [Math.random() * 6.3, Math.random() * 6.3], freq: [0.7 + Math.random() * 0.6, 0.7 + Math.random() * 0.6],
-      shape: cloudShape(seed++ * 9973, o.puffs || 34), logo: 0, labelA: 0, ...o,
+      shape: cloudShape(seed++ * 9973, o.puffs || 34), logo: 0, labelA: 0, split: 0, ...o,
     };
     b.idx = bodies.length;
     bodies.push(b);
@@ -43,9 +43,13 @@ export function startSky({ canvas, labels, center, engines }) {
   const favs = FAVORITES.map((it) =>
     make({ kind: "fav", label: it.name, url: it.url, size: it.size || 1, puffs: 40, key: it.url, item: it }),
   );
-  const search = engines.map((btn) =>
-    make({ kind: "search", btn, size: 0.46, puffs: 26, key: `s:${btn.dataset.engine}`, item: { url: SEARCH_ICONS[btn.dataset.engine] } }),
-  );
+  const search = [
+    ...engines.map((btn) =>
+      make({ kind: "search", btn, size: 0.46, puffs: 26, key: `s:${btn.dataset.engine}`, item: { url: SEARCH_ICONS[btn.dataset.engine] } })),
+    // стрелки смены картины: такие же облачка, привязанные к кнопкам внизу
+    ...navs.map((btn) =>
+      make({ kind: "search", btn, size: 0.5, puffs: 26, key: `n:${btn.dataset.nav}`, item: { icon: `assets/nav-${btn.dataset.nav}.svg` } })),
+  ];
   const clock = { kind: "clock", x: 0, y: 0, r: 200, vx: 0, vy: 0, t: 0, calm: 0 };
   R.setShapes(bodies.map((b) => b.shape));
 
@@ -120,7 +124,7 @@ export function startSky({ canvas, labels, center, engines }) {
     if (open && open !== g) collapse(open);
     open = g;
     g.children.forEach((c) => {
-      if (c.appear < 0.05) { c.x = g.x + (Math.random() - 0.5) * 10; c.y = g.y + (Math.random() - 0.5) * 10; c.vx = c.vy = 0; }
+      if (c.appear < 0.05) { c.x = g.x + (Math.random() - 0.5) * g.r * 0.5; c.y = g.y + (Math.random() - 0.5) * g.r * 0.5; c.vx = c.vy = 0; c.appear = 0.35; }
       c.appearTo = 1;
     });
     lastInside = performance.now();
@@ -136,12 +140,12 @@ export function startSky({ canvas, labels, center, engines }) {
     const out = [];
     let k = 0;
     rings.forEach((m, ri) => {
-      const arc = ri === 0 ? Math.PI * 1.05 : Math.PI * 0.75;
-      const R0 = g.r * 0.95 + rc * (1.25 + ri * 2.25);
-      const need = (m * rc * 2.3) / arc;
-      const Rr = Math.max(R0, need + ri * rc * 2.2);
+      const arc = Math.PI * 2;
+      const R0 = g.r * 0.35 + rc * 0.6;
+      const need = (m * rc * 2.1) / arc;
+      const Rr = Math.max(R0, need) + ri * rc * 1.9;
       for (let j = 0; j < m; j++, k++) {
-        const a = toC + (m === 1 ? 0 : (j / (m - 1) - 0.5) * arc);
+        const a = toC + Math.PI + (ri ? Math.PI / m : 0) + (j / m) * arc;
         out.push({
           x: Math.min(W - rc, Math.max(rc, g.x + Math.cos(a) * Rr)),
           y: Math.min(H - rc * 0.9, Math.max(rc * 0.9, g.y + Math.sin(a) * Rr)),
@@ -212,7 +216,8 @@ export function startSky({ canvas, labels, center, engines }) {
       active.push(b);
       b.ax = 0; b.ay = 0;
       if (b.delay > 0) { b.delay -= dt; continue; }
-      b.appear += (b.appearTo - b.appear) * (1 - Math.exp(-dt * (b.kind === "child" ? 4.5 : 1.6)));
+      b.appear += (b.appearTo - b.appear) * (1 - Math.exp(-dt * (b.kind === "child" ? 9 : 1.6)));
+      if (b.kind === "group") b.split += ((open === b ? 1 : 0) - b.split) * (1 - Math.exp(-dt * 7));
       b.logo = (b.logo || 0) + ((b.logoTo || 0) - (b.logo || 0)) * (1 - Math.exp(-dt * 2));
 
       const d = Math.hypot(cur.x - b.x, cur.y - b.y) - b.r;
@@ -236,7 +241,7 @@ export function startSky({ canvas, labels, center, engines }) {
         const i = p.children.indexOf(b);
         const tg = b.appearTo && targets && open === p ? targets[i] : { x: p.x, y: p.y };
         tx = tg.x + Math.sin(b.t * 0.21 + b.ph[0]) * 6; ty = tg.y + Math.cos(b.t * 0.17 + b.ph[1]) * 6;
-        k = 9; c = 5.5;
+        k = 13; c = 7.5;
       } else {
         const A = 46 * S;
         tx = b.home.x + Math.sin(b.t * 0.055 * b.freq[0] + b.ph[0]) * A + Math.sin(b.t * 0.021 + b.ph[1]) * A * 0.6;
@@ -263,8 +268,8 @@ export function startSky({ canvas, labels, center, engines }) {
         const ma = mass(a), mb = mass(b);
         if (ma === Infinity && mb === Infinity) continue;
         if ((a.kind === "search" && b.kind === "clock") || (b.kind === "search" && a.kind === "clock")) continue;
-        const ra = a.kind === "clock" ? a.r : a.r * ease(a.appear);
-        const rb = b.kind === "clock" ? b.r : b.r * ease(b.appear);
+        const ra = a.kind === "clock" ? a.r : a.r * ease(a.appear) * (1 - 0.8 * (a.split || 0));
+        const rb = b.kind === "clock" ? b.r : b.r * ease(b.appear) * (1 - 0.8 * (b.split || 0));
         const minD = (ra + rb) * 0.98;
         let dx = b.x - a.x, dy = b.y - a.y;
         let dd = Math.hypot(dx, dy);
@@ -288,7 +293,7 @@ export function startSky({ canvas, labels, center, engines }) {
     for (const b of active) {
       if (b.kind === "search" || b.delay > 0) continue;
       b.vx += b.ax * dt; b.vy += b.ay * dt;
-      const v = Math.hypot(b.vx, b.vy), vmax = (b.kind === "child" ? 900 : 160) * S;
+      const v = Math.hypot(b.vx, b.vy), vmax = (b.kind === "child" ? 450 : 160) * S;
       if (v > vmax) { b.vx *= vmax / v; b.vy *= vmax / v; }
       b.x += b.vx * dt; b.y += b.vy * dt;
     }
@@ -297,12 +302,12 @@ export function startSky({ canvas, labels, center, engines }) {
     bodies.forEach((b, i) => {
       const s = states[i];
       const ap = b.delay > 0 ? 0 : b.appear;
-      s.x = b.x; s.y = b.y; s.r = b.r * (0.35 + 0.65 * ease(ap)); s.t = b.anim;
+      s.x = b.x; s.y = b.y; s.r = b.r * (0.35 + 0.65 * ease(ap)) * (1 - 0.35 * b.split); s.t = b.anim;
       s.cx = b.cell ? b.cell[0] : 0; s.cy = b.cell ? b.cell[1] : 0;
-      s.logo = b.cell ? b.logo * ease(ap) : 0;
-      s.alpha = Math.min(1, ap * 1.4);
+      s.logo = b.cell ? b.logo * ease(ap) * (1 - b.split) : 0;
+      s.alpha = Math.min(1, ap * 1.4) * (1 - b.split);
       if (b.el) {
-        const want = b.kind === "group" ? (open === b ? 0.5 : 1) * ap :
+        const want = b.kind === "group" ? (1 - b.split) * ap :
           b.kind === "child" ? smooth(0.6, 1, ap) :
           Math.max(b.calm * 0.95, hovered === b ? 1 : 0) * ap;
         b.labelA += (want - b.labelA) * (1 - Math.exp(-dt * 6));

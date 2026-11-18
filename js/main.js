@@ -1,4 +1,5 @@
 import { startBackground } from "./background.js";
+import { PAINTINGS } from "./paintings.js";
 import { startSparks } from "./sparks.js";
 import { startSearch } from "./search.js";
 import { startSky } from "./sky.js";
@@ -30,9 +31,25 @@ function toast(msg) {
 
 // ── запуск ───────────────────────────────────────────────────
 const params = new URLSearchParams(location.search);
-startBackground($("#bg"), {
-  src: "assets/starry-night.jpg",
+const bg = startBackground($("#bg"), {
+  paintings: PAINTINGS,
   pixel: Number(params.get("pixel")) || 0,   // ?pixel=220 — ретро-пиксели как в Balatro
+});
+// Смена картины: облачка снизу и стрелки ← → на клавиатуре; название всплывает на несколько секунд.
+const titleEl = $("#paint-title");
+let titleTimer;
+bg?.onChange((p) => {
+  titleEl.textContent = p.title;
+  titleEl.classList.add("show");
+  clearTimeout(titleTimer);
+  titleTimer = setTimeout(() => titleEl.classList.remove("show"), 4500);
+});
+document.querySelectorAll(".nav-btn").forEach((b) =>
+  b.addEventListener("click", () => (b.dataset.nav === "next" ? bg?.next() : bg?.prev())));
+addEventListener("keydown", (e) => {
+  if (e.target.closest?.("input, textarea") || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.key === "ArrowRight") bg?.next();
+  if (e.key === "ArrowLeft") bg?.prev();
 });
 startSparks($("#sparks"));
 startSearch($("#search"), toast);
@@ -43,6 +60,7 @@ try {
     labels: $("#labels"),
     center: $("#center"),
     engines: [...document.querySelectorAll(".engine")],
+    navs: [...document.querySelectorAll(".nav-btn")],
   });
   // Невидимый список ссылок — для клавиатуры (Tab) и скринридеров.
   const nav = $("#a11y");
