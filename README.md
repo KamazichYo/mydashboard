@@ -39,3 +39,6 @@
 | `assets/starry-night.jpg` | картина (общественное достояние, Wikimedia Commons) |
 
 Без сборки и зависимостей: чистые HTML/CSS/JS. Локально: `python3 -m http.server` в папке и открыть `http://localhost:8000`.
+
+## Страница «Модели ИИ» (`models.html`)
+Отдельная страница с тем же оформлением (картины Ван Гога, стекло, искры), открывается в новой вкладке облаком «Модели ИИ» на домашней. Виды: таблица (сортировка по заголовкам и из списка, группировка, фильтры по цене, рассуждению, прошедшим тест, поиск), карточки, график «цена и сила» с границей выгоды, раскладка по задачам, траты (по данным дашборда) и калькулятор. Данные: `js/models-data.js`, генерируется `python3 tools/build-models-data.py` из таблицы коэффициентов (`context/providers/baza-ai-notes.md`), замеров (`context/providers/bench/`: `bench.py`, `calib.py`, `gen_desc.py`) и `insights.json`. Параметры: `?view=chart|cards|tasks|spend`, `?scope=baza|claude|all`, `?sort=`, `?group=`, `?open=<id>`.

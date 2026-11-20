@@ -18,6 +18,7 @@ export const FAVORITES = [
   { name: "List.am",    url: "https://www.list.am/",         size: 0.9 },
   { name: "ChatGPT",    url: "https://chatgpt.com/",         size: 0.9 },
   { name: "Perplexity", url: "https://www.perplexity.ai/",   size: 0.95 },
+  { name: "Модели ИИ", url: "models.html",             size: 0.95, icon: "assets/icons/models.png" },
   { name: "Pinterest",  url: "https://www.pinterest.com/",   size: 0.95 },
 ];
 

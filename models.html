@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Модели ИИ</title>
+  <meta name="theme-color" content="#0b1430">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%231b2f63'/><path d='M18 40l10-18 8 12 6-8 8 14z' fill='%23f5d547'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/models.css">
+</head>
+<body>
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <canvas id="sparks" aria-hidden="true"></canvas>
+
+  <main class="wrap">
+    <header class="top">
+      <a class="home" href="index.html" aria-label="На домашнюю страницу" title="На домашнюю страницу">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <div>
+        <h1>Модели ИИ</h1>
+        <p class="lead">Что доступно Гермионе и Вере, сколько стоит и для каких задач брать. Замеры от <span id="stamp"></span>.</p>
+      </div>
+    </header>
+
+    <section class="panel controls" id="controls">
+      <div class="row">
+        <div class="seg" id="scope" role="tablist" aria-label="Чьи модели">
+          <button data-v="baza" class="on">Гермиона · BazaAI</button>
+          <button data-v="claude">Вера · Claude Code</button>
+          <button data-v="all">Все</button>
+        </div>
+        <div class="seg" id="views" role="tablist" aria-label="Вид">
+          <button data-v="table" class="on">Таблица</button>
+          <button data-v="cards">Карточки</button>
+          <button data-v="chart">График</button>
+          <button data-v="tasks">По задачам</button>
+          <button data-v="spend">Траты</button>
+        </div>
+      </div>
+      <div class="row filters" id="filterRow">
+        <label class="sel">Сортировка
+          <select id="sortKey"></select>
+        </label>
+        <button class="chip dir" id="sortDir" title="Направление сортировки">↑</button>
+        <label class="sel">Группировка
+          <select id="groupKey">
+            <option value="">без групп</option>
+            <option value="vendor">по семейству</option>
+            <option value="tier">по цене</option>
+            <option value="reason">по режиму рассуждений</option>
+          </select>
+        </label>
+        <span class="sep"></span>
+        <div class="chips" id="tierChips">
+          <button class="chip" data-t="cheap">дешёвые ≤ ×0.75</button>
+          <button class="chip" data-t="mid">средние ×1–2</button>
+          <button class="chip" data-t="pricey">дорогие ≥ ×2.4</button>
+          <button class="chip" data-t="reason">с рассуждением</button>
+          <button class="chip" data-t="ok">прошли тест</button>
+        </div>
+        <input id="q" class="q" type="search" placeholder="Поиск модели…" spellcheck="false" aria-label="Поиск модели">
+      </div>
+    </section>
+
+    <section id="out" class="out" aria-live="polite"></section>
+    <footer class="foot">Цены в ₽ считаются по сайту провайдера: от 20 ₽ за 1 млн токенов, от пакета 100 млн — 10 ₽, умножаются на коэффициент модели. «Сила» — оценка самого провайдера, а не независимый бенчмарк.</footer>
+  </main>
+  <div id="tip" class="tip" role="tooltip"></div>
+
+  <script type="module" src="js/models.js"></script>
+</body>
+</html>

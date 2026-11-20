@@ -5,7 +5,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { FAVORITES, GROUPS, SEARCH_ICONS } from "../js/links.js";
 
 const urls = [
-  ...FAVORITES.map((i) => i.url),
+  ...FAVORITES.filter((i) => /^https?:/.test(i.url) && !i.icon).map((i) => i.url),
   ...GROUPS.flatMap((g) => g.items.map((i) => i.url)),
   ...Object.values(SEARCH_ICONS),
 ];
